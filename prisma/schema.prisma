@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  PROFESSOR
+  ALUNO
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  professor Professor?
+  aluno     Aluno?
+  admin     Admin?
+}
+
+model Admin {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Professor {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  turmas Turma[]
+}
+
+model Aluno {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+
+  turmas      TurmaAluno[]
+  frequencias Frequencia[]
+}
+
+model Turma {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  professorId Int
+
+  professor   Professor   @relation(fields: [professorId], references: [id])
+  alunos      TurmaAluno[]
+  frequencias Frequencia[]
+}
+
+model TurmaAluno {
+  id      Int @id @default(autoincrement())
+  turmaId Int
+  alunoId Int
+
+  turma Turma @relation(fields: [turmaId], references: [id])
+  aluno Aluno @relation(fields: [alunoId], references: [id])
+}
+
+model Frequencia {
+  id            Int      @id @default(autoincrement())
+  turmaId       Int
+  alunoId       Int
+  data          DateTime
+  presente      Boolean
+  justificativa String?
+
+  turma Turma @relation(fields: [turmaId], references: [id])
+  aluno Aluno @relation(fields: [alunoId], references: [id])
+}
