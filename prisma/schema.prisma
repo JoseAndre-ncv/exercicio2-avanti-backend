@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -36,8 +37,19 @@ model Professor {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
 
-  turmas Turma[]
+  materias Materia[]
 }
+
+model Materia {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  professorId Int
+
+  professor   Professor @relation(fields: [professorId], references: [id])
+  turmas      Turma[]
+  frequencias Frequencia[]
+}
+
 
 model Aluno {
   id        Int      @id @default(autoincrement())
@@ -49,13 +61,12 @@ model Aluno {
 }
 
 model Turma {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  professorId Int
+  id        Int @id @default(autoincrement())
+  nome      String
+  materiaId Int
 
-  professor   Professor   @relation(fields: [professorId], references: [id])
-  alunos      TurmaAluno[]
-  frequencias Frequencia[]
+  materia Materia @relation(fields: [materiaId], references: [id])
+  alunos  TurmaAluno[]
 }
 
 model TurmaAluno {
@@ -69,12 +80,13 @@ model TurmaAluno {
 
 model Frequencia {
   id            Int      @id @default(autoincrement())
-  turmaId       Int
   alunoId       Int
+  materiaId     Int
   data          DateTime
   presente      Boolean
   justificativa String?
 
-  turma Turma @relation(fields: [turmaId], references: [id])
-  aluno Aluno @relation(fields: [alunoId], references: [id])
+  aluno   Aluno   @relation(fields: [alunoId], references: [id])
+  materia Materia @relation(fields: [materiaId], references: [id])
 }
+

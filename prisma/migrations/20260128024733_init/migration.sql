@@ -28,7 +28,14 @@ CREATE TABLE "Professor" (
 
     CONSTRAINT "Professor_pkey" PRIMARY KEY ("id")
 );
+---CreateTable
+CREATE TABLE "Materia" (
+    "id" INTEGER NOT NULL,
+    "nome" TEXT NOT NULL,
+    "professorId" INTEGER NOT NULL,
 
+    CONSTRAINT "Materia_pkey" PRIMARY KEY ("id")
+);
 -- CreateTable
 CREATE TABLE "Aluno" (
     "id" SERIAL NOT NULL,
@@ -58,7 +65,7 @@ CREATE TABLE "TurmaAluno" (
 -- CreateTable
 CREATE TABLE "Frequencia" (
     "id" SERIAL NOT NULL,
-    "turmaId" INTEGER NOT NULL,
+    "materiaId" INTEGER NOT NULL,
     "alunoId" INTEGER NOT NULL,
     "data" TIMESTAMP(3) NOT NULL,
     "presente" BOOLEAN NOT NULL,
@@ -98,7 +105,10 @@ ALTER TABLE "TurmaAluno" ADD CONSTRAINT "TurmaAluno_turmaId_fkey" FOREIGN KEY ("
 ALTER TABLE "TurmaAluno" ADD CONSTRAINT "TurmaAluno_alunoId_fkey" FOREIGN KEY ("alunoId") REFERENCES "Aluno"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Frequencia" ADD CONSTRAINT "Frequencia_turmaId_fkey" FOREIGN KEY ("turmaId") REFERENCES "Turma"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Frequencia" ADD CONSTRAINT "Frequencia_materiaId_fkey" FOREIGN KEY ("materiaId") REFERENCES "Materia"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Frequencia" ADD CONSTRAINT "Frequencia_alunoId_fkey" FOREIGN KEY ("alunoId") REFERENCES "Aluno"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--AddForeignKey
+ALTER TABLE "Materia" ADD CONSTRAINT "Materia_professorId_fkey" FOREIGN KEY ("professorId") REFERENCES "Professor"("id");

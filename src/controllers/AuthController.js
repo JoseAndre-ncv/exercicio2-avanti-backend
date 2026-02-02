@@ -1,30 +1,22 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const prisma = require('../database/prisma');
-const { secret, expiresIn } = require('../config/jwt');
+const { generateToken } = require('../config/jwt');
 const { loginSchema } = require('../validators/auth.validator');
-
-loginSchema.parse(req.body);
 
 class AuthController {
   async login(req, res) {
-    const { email, password } = req.body;
-
     try {
-      const user = await prisma.user.findUnique({ where: { email } });
+      const { email, senha } = loginSchema.parse(req.body);
 
+      const user = await prisma.user.findUnique({ where: { email } });
       if (!user)
         return res.status(400).json({ error: 'Usuário não encontrado' });
 
-      const valid = await bcrypt.compare(password, user.password);
+      const valid = await bcrypt.compare(senha, user.password);
       if (!valid)
         return res.status(400).json({ error: 'Senha inválida' });
 
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        secret,
-        { expiresIn }
-      );
+      const token = generateToken({ id: user.id, role: user.role });
 
       return res.json({
         token,

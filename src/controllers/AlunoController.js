@@ -25,9 +25,10 @@ class AlunoController {
         where: { userId: req.user.id }
       });
 
+      const {materiaId}=req.query;
+
       const frequencias = await prisma.frequencia.findMany({
-        where: { alunoId: aluno.id },
-        include: { turma: true }
+        where: { alunoId: aluno.id, materiaId:Number(materiaId) }
       });
 
       return res.json(frequencias);
