@@ -46,8 +46,17 @@ model Materia {
   professorId Int
 
   professor   Professor @relation(fields: [professorId], references: [id])
-  turmas      Turma[]
+  alunos      MateriaAluno[]
   frequencias Frequencia[]
+}
+
+model MateriaAluno {
+  id        Int @id @default(autoincrement())
+  materiaId Int
+  alunoId   Int
+
+  materia Materia @relation(fields: [materiaId], references: [id])
+  aluno   Aluno   @relation(fields: [alunoId], references: [id])
 }
 
 
@@ -56,26 +65,8 @@ model Aluno {
   userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id])
 
-  turmas      TurmaAluno[]
+  materias    MateriaAluno[]
   frequencias Frequencia[]
-}
-
-model Turma {
-  id        Int @id @default(autoincrement())
-  nome      String
-  materiaId Int
-
-  materia Materia @relation(fields: [materiaId], references: [id])
-  alunos  TurmaAluno[]
-}
-
-model TurmaAluno {
-  id      Int @id @default(autoincrement())
-  turmaId Int
-  alunoId Int
-
-  turma Turma @relation(fields: [turmaId], references: [id])
-  aluno Aluno @relation(fields: [alunoId], references: [id])
 }
 
 model Frequencia {

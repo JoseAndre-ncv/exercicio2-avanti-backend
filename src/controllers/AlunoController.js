@@ -2,22 +2,24 @@ const prisma = require('../database/prisma');
 
 
 class AlunoController {
-  async turmasMatriculadas(req, res) {
-    try {
-      const aluno = await prisma.aluno.findUnique({
-        where: { userId: req.user.id },
-        include: {
-          turmas: {
-            include: { turma: true }
+  async materiasMatriculadas(req, res) {
+  try {
+    const aluno = await prisma.aluno.findUnique({
+      where: { userId: req.user.id },
+      include: {
+        materias: {
+          include: {
+            materia: true
           }
         }
-      });
+      }
+    });
 
-      return res.json(aluno.turmas.map(t => t.turma));
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    return res.json(aluno.materias.map(m => m.materia));
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
+}
 
   async minhaFrequencia(req, res) {
     try {

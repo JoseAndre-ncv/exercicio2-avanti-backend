@@ -36,30 +36,21 @@ CREATE TABLE "Materia" (
 
     CONSTRAINT "Materia_pkey" PRIMARY KEY ("id")
 );
+--CreateTable
+CREATE TABLE "MateriaAluno" (
+    "id" SERIAL NOT NULL,
+    "materiaId" INTEGER NOT NULL,
+    "alunoId" INTEGER NOT NULL,
+
+    CONSTRAINT "MateriaAluno_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "Aluno" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Aluno_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Turma" (
-    "id" SERIAL NOT NULL,
-    "nome" TEXT NOT NULL,
-    "professorId" INTEGER NOT NULL,
-
-    CONSTRAINT "Turma_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "TurmaAluno" (
-    "id" SERIAL NOT NULL,
-    "turmaId" INTEGER NOT NULL,
-    "alunoId" INTEGER NOT NULL,
-
-    CONSTRAINT "TurmaAluno_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -96,15 +87,6 @@ ALTER TABLE "Professor" ADD CONSTRAINT "Professor_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "Aluno" ADD CONSTRAINT "Aluno_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Turma" ADD CONSTRAINT "Turma_professorId_fkey" FOREIGN KEY ("professorId") REFERENCES "Professor"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TurmaAluno" ADD CONSTRAINT "TurmaAluno_turmaId_fkey" FOREIGN KEY ("turmaId") REFERENCES "Turma"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TurmaAluno" ADD CONSTRAINT "TurmaAluno_alunoId_fkey" FOREIGN KEY ("alunoId") REFERENCES "Aluno"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Frequencia" ADD CONSTRAINT "Frequencia_materiaId_fkey" FOREIGN KEY ("materiaId") REFERENCES "Materia"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -112,3 +94,10 @@ ALTER TABLE "Frequencia" ADD CONSTRAINT "Frequencia_alunoId_fkey" FOREIGN KEY ("
 
 --AddForeignKey
 ALTER TABLE "Materia" ADD CONSTRAINT "Materia_professorId_fkey" FOREIGN KEY ("professorId") REFERENCES "Professor"("id");
+
+--AddForeignKey
+ALTER TABLE "MateriaAluno" ADD CONSTRAINT "MateriaAluno_materiaId_fkey" FOREIGN KEY ("materiaId") REFERENCES "Materia"("id");
+
+--AddForeignKey
+ALTER TABLE "MateriaAluno" ADD CONSTRAINT "MateriaAluno_alunoId_fkey" FOREIGN KEY ("alunoId") REFERENCES "Aluno"("id");
+
