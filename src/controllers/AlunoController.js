@@ -53,6 +53,26 @@ class AlunoController {
       return res.status(400).json({ error: error.message });
     }
   }
+
+  async meuPerfil(req, res) {
+    try {
+      const aluno = await prisma.aluno.findUnique({
+        where: { userId: req.user.id },
+        include: { user: true } // inclui os dados do User
+      });
+
+      if (!aluno)
+        return res.status(404).json({ error: 'Aluno não encontrado' });
+
+      return res.json({
+        id: aluno.id,
+        nome: aluno.user.name,
+        email: aluno.user.email
+      });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new AlunoController();

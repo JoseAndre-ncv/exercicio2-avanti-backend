@@ -7,8 +7,10 @@ const router = express.Router();
 
 router.use(auth, role(['ALUNO']));
 
+router.get('/turmas',AlunoController.materiasMatriculadas);
 router.get('/materias', AlunoController.materiasMatriculadas);
 router.get('/frequencia', AlunoController.minhaFrequencia);
-router.post('/justificativa', AlunoController.justificarFalta);
+router.post('/justificar', AlunoController.justificarFalta);
+router.get('/perfil', AlunoController.meuPerfil);
 
 module.exports = router;
