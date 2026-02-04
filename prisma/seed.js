@@ -1,45 +1,80 @@
-const prisma = require('../src/prisma/client');
+const prisma = require('../src/database/prisma');
 const bcrypt = require('bcryptjs');
 
 async function main() {
-  const senha = await bcrypt.hash('123456', 10);
+  const password = await bcrypt.hash('123456', 10);
 
-  const admin = await prisma.user.create({
+  // ======================
+  // USER + ADMIN
+  // ======================
+  const adminUser = await prisma.user.create({
     data: {
-      nome: 'Administrador',
+      name: 'Administrador',
       email: 'admin@admin.com',
-      senha,
-      role: 'ADMIN'
+      password,
+      role: 'ADMIN',
+      admin: {
+        create: {}
+      }
     }
   });
 
-  const professor = await prisma.user.create({
+  // ======================
+  // USER + PROFESSOR
+  // ======================
+  const professorUser = await prisma.user.create({
     data: {
-      nome: 'Professor',
+      name: 'Professor',
       email: 'prof@escola.com',
-      senha,
-      role: 'PROFESSOR'
+      password,
+      role: 'PROFESSOR',
+      professor: {
+        create: {}
+      }
     }
   });
 
-  const aluno = await prisma.user.create({
+  // ======================
+  // USER + ALUNO
+  // ======================
+  const alunoUser = await prisma.user.create({
     data: {
-      nome: 'Aluno',
+      name: 'Aluno',
       email: 'aluno@escola.com',
-      senha,
-      role: 'ALUNO'
+      password,
+      role: 'ALUNO',
+      aluno: {
+        create: {}
+      }
     }
   });
 
-  await prisma.turma.create({
+  // Buscar entidades criadas
+  const professor = await prisma.professor.findUnique({
+    where: { userId: professorUser.id }
+  });
+
+  const aluno = await prisma.aluno.findUnique({
+    where: { userId: alunoUser.id }
+  });
+
+  // ======================
+  // TURMA
+  // ======================
+  const turma = await prisma.turma.create({
     data: {
       nome: 'Turma A',
-      professores: {
-        connect: { id: professor.id }
-      },
-      alunos: {
-        connect: { id: aluno.id }
-      }
+      professorId: professor.id
+    }
+  });
+
+  // ======================
+  // VINCULAR ALUNO À TURMA
+  // ======================
+  await prisma.turmaAluno.create({
+    data: {
+      turmaId: turma.id,
+      alunoId: aluno.id
     }
   });
 
@@ -47,7 +82,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })
