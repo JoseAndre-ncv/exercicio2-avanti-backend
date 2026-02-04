@@ -7,23 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  PROFESSOR
-  ALUNO
-}
-
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  email     String   @unique
+  email     String     @unique
   password  String
   role      Role
-  createdAt DateTime @default(now())
-
-  professor Professor?
-  aluno     Aluno?
+  createdAt DateTime   @default(now())
   admin     Admin?
+  aluno     Aluno?
+  professor Professor?
 }
 
 model Admin {
@@ -33,51 +26,52 @@ model Admin {
 }
 
 model Professor {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
-
+  id       Int       @id @default(autoincrement())
+  userId   Int       @unique
   materias Materia[]
+  user     User      @relation(fields: [userId], references: [id])
 }
 
 model Materia {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   nome        String
   professorId Int
-
-  professor   Professor @relation(fields: [professorId], references: [id])
-  alunos      MateriaAluno[]
   frequencias Frequencia[]
+  professor   Professor      @relation(fields: [professorId], references: [id])
+  alunos      MateriaAluno[]
+}
+
+model Aluno {
+  id          Int            @id @default(autoincrement())
+  userId      Int            @unique
+  user        User           @relation(fields: [userId], references: [id])
+  frequencias Frequencia[]
+  materias    MateriaAluno[]
 }
 
 model MateriaAluno {
-  id        Int @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   materiaId Int
   alunoId   Int
-
-  materia Materia @relation(fields: [materiaId], references: [id])
-  aluno   Aluno   @relation(fields: [alunoId], references: [id])
-}
-
-
-model Aluno {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
-
-  materias    MateriaAluno[]
-  frequencias Frequencia[]
+  aluno     Aluno   @relation(fields: [alunoId], references: [id])
+  materia   Materia @relation(fields: [materiaId], references: [id])
+  @@unique([materiaId,alunoId])
 }
 
 model Frequencia {
   id            Int      @id @default(autoincrement())
-  alunoId       Int
   materiaId     Int
+  alunoId       Int
   data          DateTime
   presente      Boolean
   justificativa String?
-
-  aluno   Aluno   @relation(fields: [alunoId], references: [id])
-  materia Materia @relation(fields: [materiaId], references: [id])
+  aluno         Aluno    @relation(fields: [alunoId], references: [id])
+  materia       Materia  @relation(fields: [materiaId], references: [id])
+  @@unique([alunoId,materiaId,data])
 }
 
+enum Role {
+  ADMIN
+  PROFESSOR
+  ALUNO
+}

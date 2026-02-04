@@ -25,20 +25,35 @@ class ProfessorController {
   }
 
   async minhasMaterias(req, res) {
-    try {
-      const professor = await prisma.professor.findUnique({
-        where: { userId: req.user.id },
-        include: { materias: true }
-      });
+  try {
+    const professor = await prisma.professor.findUnique({
+      where: { userId: req.user.id },
+      include: {
+        materias: {
+          include: {
+            alunos: {
+              include: {
+                aluno: {
+                  include: {
+                    user: true
+                  }
+                }
+              }
+            },
+            frequencias: true
+          }
+        }
+      }
+    });
 
-      if (!professor)
-        return res.status(404).json({ error: 'Professor não encontrado' });
+    if (!professor)
+      return res.status(404).json({ error: 'Professor não encontrado' });
 
-      return res.json(professor.materias);
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    return res.json(professor.materias);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
+}
 
   async adicionarAluno(req, res) {
     const { materiaId } = req.params;
@@ -55,12 +70,10 @@ class ProfessorController {
       if (!materia)
         return res.status(403).json({ error: 'Matéria não pertence a você' });
 
-      await prisma.materia.update({
-        where: { id: Number(materiaId) },
+      await prisma.materiaAluno.create({
         data: {
-          alunos: {
-            connect: { id: Number(alunoId) }
-          }
+          materiaId: Number(materiaId),
+          alunoId: Number(alunoId)
         }
       });
 
@@ -69,26 +82,6 @@ class ProfessorController {
       return res.status(400).json({ error: error.message });
     }
   }
-
-  async registrarFrequencia(req, res) {
-    const { materiaId, alunoId, presente, data } = req.body;
-
-    try {
-      const frequencia = await prisma.frequencia.create({
-        data: {
-          materiaId: Number(materiaId),
-          alunoId: Number(alunoId),
-          presente,
-          data: data ? new Date(data) : new Date()
-        }
-      });
-
-      return res.status(201).json(frequencia);
-    } catch (error) {
-      return res.status(400).json({ error: error.message });
-    }
-  }
-
 
   async historicoAluno(req, res) {
     const { alunoId } = req.params;
@@ -164,6 +157,5 @@ class ProfessorController {
     }
   }
 }
-
 
 module.exports = new ProfessorController();
